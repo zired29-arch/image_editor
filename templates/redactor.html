@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Редактор изображений
+{% endblock %}
+
+{% block content %}
+    <div class="image"> 
+        <form method="post">
+            <div class="buttons"> 
+                <button name="action" value="rotate_right"> Повернуть вправо </button>
+                <button name="action" value="rotate_left"> Повернуть влево </button>
+                <button name="action" value="flip"> Отзеркалить </button>
+                <button name="action" value="make_grey"> Ч/Б </button>
+                <button name="action" value="make_emboss"> Тиснение </button>
+                <div class="inputholder"> 
+                    <button name="action" value="make_sharp"> Резкость </button>
+                    <input type="number" name="sharp_value" class="value" value="1"> 
+                </div>
+                <div class="inputholder"> 
+                    <button name="action" value="make_blur"> Сглаживание </button>
+                    <input type="number" name="blur_value" class="value" value="1"> 
+                </div>
+                <div class="placeholder"> <p class="align"> {{ image_scale }} </p> </div>
+                {% if not clone %}
+                    <button name="action" value="return"> Отменить действие </button>
+                {% endif %}
+            </div>
+        </form>
+        
+        <div class="imageholder"> <img class="user_image" src="{{ url_for('static', filename='images/' + image_path) }}"> </div>
+    </div>
+    <button class="submit"> 
+        <a href="/download/{{ image_path }}" class="url black"> Сохранить картинку  </a>
+    </button>
+{% endblock %}

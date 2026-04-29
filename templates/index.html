@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}
+    Редактор изображений
+{% endblock %}
+
+{% block content %}
+    <h1> Редактор изображений </h1>
+    <div class="window">
+        <h2> {{logtype}} </h2>
+        <form method="post">
+            <h5> Введите логин </h5>
+            <input type="text" name="username" class="textbox">
+            <h5> Введите пароль </h5>
+            <input type="password" name="password" class="textbox"> <br>
+            {% if error %}
+                <p class="red"> {{error}} </p>
+            {% endif %}
+            {% if logtype == "Регистрация" %}
+                <p class="textalign"> <a href="/login" class="url gray"> Уже есть аккаунт </a> </p>
+                <div> <button class="click"> Зарегистрироваться </button> </div>
+            {% else %}
+                <p class="textalign"> <a href="/" class="url gray"> У меня нет аккаунта </a> </p>
+                <div> <button class="click"> Войти </button> </div>
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}

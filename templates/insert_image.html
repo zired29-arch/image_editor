@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Редактор изображений
+{% endblock %}
+
+{% block content %}
+
+    {% if session.get("image_id") %}
+        <a href="/redactor/{{ session['image_id'] }}">
+            <button class="submit"> Перейти к последней картинке </button>
+        </a>
+    {% else %}
+        <h2> Картинка отсутствует! </h2>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        <div> <input type="file" name="image" class="margin" accept="image/png, image/jpg, image/jpeg, image/webp, image/avif"> </div>
+        <div> 
+            <button class="submit"> Подтвердить </button>  
+        </div>
+    </form>
+{% endblock %}
