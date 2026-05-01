@@ -5,3 +5,4 @@ peewee
 schedule
 pytest
 beautifulsoup4
+dotenv

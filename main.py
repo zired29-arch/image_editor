@@ -11,37 +11,19 @@ import utils
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-mail_key = os.getenv("MAILKEY2")
+mail_key = os.getenv("MAILKEY")
+email = os.getenv("EMAIL")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - - %(levelname)s - - %(message)s")
 peewee_logger = logging.getLogger("peewee")
 peewee_logger.setLevel(logging.DEBUG)
 
-class SMTPHandlerNew(SMTPHandler):
-    def emit(self, record):
-        try:
-            import smtplib
-            from email.message import EmailMessage
-            import email.utils
-
-            msg = EmailMessage()
-            msg['From'] = self.fromaddr
-            msg['To'] = ','.join(self.toaddrs)
-            msg['Subject'] = self.getSubject(record)
-            msg['Date'] = email.utils.localtime()
-            msg.set_content(self.format(record))
-            with smtplib.SMTP_SSL(self.mailhost, self.mailport, timeout=10) as connect:
-                connect.login(self.username, self.password)
-                connect.send_message(msg)
-        except Exception:
-            self.handleError(record)
-
 mail_handler = SMTPHandler(
     mailhost=("smtp.yandex.ru", 587), 
-    fromaddr="zired292@yandex.ru", 
-    toaddrs=["zired292@yandex.ru"],
+    fromaddr=email, 
+    toaddrs=[email],
     subject="Сообщение об ошибке",
-    credentials=("zired292@yandex.ru", mail_key),
+    credentials=(email, mail_key),
     secure=()
 )
 
