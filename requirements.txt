@@ -1,0 +1,7 @@
+Werkzeug
+Flask
+pillow
+peewee
+schedule
+pytest
+beautifulsoup4
