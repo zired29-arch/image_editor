@@ -83,7 +83,7 @@ def test_login_success(client):
     form_data = {"username": "qwerty123",
                  "password": "qwerty123"}
     response = client.post("/", data=form_data)
-    client.get("/loguout")
+    client.get("/logout")
     response = client.post("/login", data=form_data)
     assert response.status_code == 302
 
@@ -93,7 +93,7 @@ def test_login_fail_user_isnt_exists(client):
                  "password": "^"
                  }
     response = client.post("/", data=form_data)
-    client.get("/loguout")
+    client.get("/logout")
     response = client.post("/login", data=form_data)
     assert response.status_code == 200
 
@@ -102,7 +102,7 @@ def test_login_fail_incorrect_password(client):
     form_data = {"username": "qwerty123",
                  "password": "qwerty123"}
     response = client.post("/", data=form_data)
-    client.get("/loguout")
+    client.get("/logout")
     form_data["password"] = "a"
     response = client.post("/login", data=form_data)
     assert response.status_code == 200
