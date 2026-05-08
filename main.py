@@ -68,9 +68,8 @@ def login():
             if check_password_hash(user_exists.password, password):
                 session["user_id"] = user_exists.id
                 session["username"] = user_exists.username
-                for photo in user_exists.photos:
-                    if photo.clone == False:
-                        session["image_id"] = photo.id
+                for photo in user_exists.photos[::-1]:
+                    session["image_id"] = photo.id
                 return redirect("/redactor")
         return render_template("index.html", logtype="Войти", error="Неправильный пароль или имя пользователя")
     return render_template("index.html", logtype="Войти")
@@ -90,18 +89,21 @@ def image_redactor():
         if width > 1024 or height > 1024:
             img_copy.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
             width, height = img_copy.width, img_copy.height
-        img_copy.save(photo_path + "_clone" + ext)
         image = Photo.get_or_none(Photo.user == User.get_or_none(User.username == session["username"]))
         if image:
             last_ext = "." + image.url.split(".")[-1]
             if last_ext != ext:
                 os.remove(photo_path + last_ext)
-                os.remove(photo_path + "_clone" + last_ext)
+                all_images = os.listdir(UPLOAD_FOLDER)
+                for image_name in all_images:
+                    if "_clone" in image_name and session["username"] in image_name:
+                        os.remove(os.path.join(UPLOAD_FOLDER, image_name))
             image.width = width
             image.height = height
-            image.url = os.path.join(session["username"]) + ext
+            image.url = session["username"] + ext
             image.save()
         else:
+            img_copy.save(photo_path + "_clone" + ext)
             image = Photo.create(url=session["username"] + ext, width=width, height=height, user=session["user_id"])
             image_clone = Photo.create(url=session["username"] + "_clone" + ext, clone=True, width=width, height=height, user=session["user_id"])
         session["image_id"] = image.id
@@ -114,13 +116,16 @@ def load_image(id):
     if not image or image.user.username != session.get("username"):
         return abort(403)
     if request.method == "POST":
-        ext = "." + image.url.split('.')[1]
+        ext = "." + image.url.split('.')[-1]
         image.clone = False
         image.save()
         button_pressed = request.form.get("action")
         if button_pressed != "return":
             img = Image.open(os.path.join(UPLOAD_FOLDER, session["username"]) + ext)
             img.save(os.path.join(UPLOAD_FOLDER, session["username"]) + "_clone" + ext)
+            img = Photo.get_or_none(Photo.user.username == session["username"] & Photo.clone == True)
+            img.url = session["username"] + "_clone" + ext
+            img.save()
             if button_pressed == "rotate_right":
                 utils.rotate_right(os.path.join("static/images", image.url))
             elif button_pressed == "rotate_left":
@@ -141,8 +146,8 @@ def load_image(id):
             user = User.get_or_none(User.username == session["username"])
             for photo in user.photos:
                 if photo.clone:
-                    img = Image.open(photo.url)
-                    img.save(photo.url.replace("_clone", ""))
+                    img = Image.open(os.path.join("static/images", photo.url))
+                    img.save(os.path.join("static/images", photo.url.replace("_clone", "")))
                     image.clone = True
                     image.save()
     return render_template("redactor.html", image_path=image.url, image_scale=f"{image.width}x{image.height}", clone=image.clone)
